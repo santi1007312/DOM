@@ -177,8 +177,67 @@ const getTasksByUser = async (req, res) => {
   }
 };
 
+// --- REQUERIMIENTOS DE ISA ---
+
+// 1. Cambiar solo el estado de la tarea (PATCH)
+const patchTaskStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const validStatuses = ['pendiente', 'en progreso', 'completada'];
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({ msn: "Estado inválido. Use: pendiente, en progreso o completada" });
+    }
+
+    const response = await fetch(`${DB_URL}/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+
+    if (!response.ok) return res.status(404).json({ msn: "Tarea no encontrada" });
+    
+    res.status(200).json({ msn: "Estado actualizado", data: await response.json() });
+  } catch (error) {
+    res.status(500).json({ msn: "Error interno al actualizar estado" });
+  }
+};
+
+// 2. Dashboard global opcional (GET)
+const getDashboard = async (req, res) => {
+  try {
+    const [usersRes, tasksRes] = await Promise.all([
+      fetch(USERS_DB_URL),
+      fetch(DB_URL)
+    ]);
+
+    const users = await usersRes.json();
+    const tasks = await tasksRes.json();
+
+    // Filtramos solo los estudiantes (IDs del 1 al 9 según la lógica de tu frontend)
+    const estudiantes = users.filter(u => Number(u.id) >= 1 && Number(u.id) <= 9);
+
+    const resumen = {
+      estadisticas: {
+        totalEstudiantes: estudiantes.length,
+        totalTareas: tasks.length,
+        pendientes: tasks.filter(t => t.status === 'pendiente').length,
+        enProgreso: tasks.filter(t => t.status === 'en progreso').length,
+        completadas: tasks.filter(t => t.status === 'completada').length
+      },
+      usuarios: estudiantes,
+      tareasGlobales: tasks
+    };
+
+    res.status(200).json(resumen);
+  } catch (error) {
+    res.status(500).json({ msn: "Error al generar el dashboard" });
+  }
+};
+
 export {
   getTasks, getTaskById, createTask, updateTask, deleteTask,
-  assignTaskToUsers, getTaskUsers, removeUserFromTask,
-  filterTasks, getTasksByUser
+  assignTaskToUsers, getTaskUsers, removeUserFromTask, filterTasks, getTasksByUser,
+  patchTaskStatus, getDashboard
 };
