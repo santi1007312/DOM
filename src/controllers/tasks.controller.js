@@ -1,14 +1,15 @@
+import pool from '../config/db.js';
 const DB_URL = 'http://localhost:4000/tasks';
 const USERS_DB_URL = 'http://localhost:4000/users';
-
 const getTasks = async (req, res) => {
   try {
-    const response = await fetch(DB_URL);
-    res.status(200).json(await response.json());
+    const [rows] = await pool.query('SELECT * FROM tasks');
+    res.status(200).json(rows);
   } catch (error) {
     res.status(500).json({ msn: "Error al obtener tareas" });
   }
 };
+
 
 const getTaskById = async (req, res) => {
   try {
@@ -60,7 +61,10 @@ const updateTask = async (req, res) => {
 
 const deleteTask = async (req, res) => {
   try {
-    await fetch(`${DB_URL}/${req.params.id}`, { method: 'DELETE' });
+    const [result] = await pool.query('DELETE FROM tasks WHERE id = ?', [req.params.id]);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ msn: "Tarea no encontrada" });
+    }
     res.status(200).json({ msn: "Tarea eliminada correctamente" });
   } catch (error) {
     res.status(500).json({ msn: "Error al eliminar tarea" });
