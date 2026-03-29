@@ -27,15 +27,19 @@ export const createUser = async (req, res) => {
 };
 
 export const updateUser = async (req, res) => {
-  const { name, email, document, role } = req.body;
+  // 1. Recibimos el status desde el frontend
+  const { name, email, document, role, status } = req.body; 
   try {
     const [result] = await pool.query(
-      'UPDATE users SET name = ?, email = ?, document = ?, role = ? WHERE id = ?',
-      [name, email, document, role, req.params.id]
+      // 2. Le decimos a MySQL que también actualice el status
+      'UPDATE users SET name = ?, email = ?, document = ?, role = ?, status = ? WHERE id = ?',
+      [name, email, document, role, status, req.params.id]
     );
     if (result.affectedRows === 0) return res.status(404).json({ msn: "Usuario no encontrado" });
     res.status(200).json({ msn: "Usuario actualizado" });
-  } catch (error) { res.status(500).json({ msn: "Error al actualizar" }); }
+  } catch (error) { 
+    res.status(500).json({ msn: "Error al actualizar" }); 
+  }
 };
 
 // Borrado Lógico

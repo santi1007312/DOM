@@ -27,10 +27,11 @@ const login = async (req, res) => {
       role: user.role
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: '2h' // El token durará 2 horas
-    });
-
+const token = jwt.sign(
+    { id: user.id, role: user.role, name: user.name }, // <- ¡Aquí está la magia!
+    process.env.JWT_SECRET,
+    { expiresIn: '2h' }
+);
     // 5. Devolvemos el pase VIP al Frontend
     res.status(200).json({
       msn: "Autenticación exitosa",
