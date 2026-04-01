@@ -15,7 +15,7 @@ const pool = mysql.createPool({
 // Probar la conexión al arrancar el servidor
 pool.getConnection()
     .then(connection => {
-        console.log('Conexión exitosa a la base de datos MySQL (taskAppDb)');
+        console.log(`Conexión exitosa a la base de datos MySQL (${process.env.DB_NAME})`);
         connection.release(); 
     })
     .catch(error => {
