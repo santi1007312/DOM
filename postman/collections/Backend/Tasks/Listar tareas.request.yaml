@@ -1,0 +1,10 @@
+$kind: http-request
+name: Listar tareas
+url: "{{urlBase}}/tasks"
+method: GET
+auth:
+  credentials:
+    - key: token
+      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsInJvbGUiOiJhZG1pbiIsIm5hbWUiOiJBbmRyw6lzIiwiaWF0IjoxNzc1NTI1OTM4LCJleHAiOjE3NzU1MzMxMzh9.GLtBOSM5O3DfPkjkbLIr0n8eMVk_rQ9xqOAK2otaucg
+  type: bearer
+order: 2000
