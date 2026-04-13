@@ -1,8 +1,0 @@
-$kind: http-request
-name: Login erroneo
-url: "{{urlBase}}/auth/login"
-method: POST
-body:
-  type: json
-  content: "{\r\n    \"document\": \"14789\"\r\n}"
-order: 1461

@@ -5,9 +5,6 @@ import {
   patchTaskStatus, getDashboard
 } from '../controllers/tasks.controller.js';
 import { verifyToken, isAdmin } from '../middlewares/auth.middleware.js';
-import { validateSchema } from '../middlewares/validate.middleware.js';
-// CORRECCIÓN: Se importan ambos esquemas
-import { createTaskSchema, updateTaskSchema } from '../schemas/task.schema.js'; 
 
 const tasksRouter = express.Router();
 
@@ -17,16 +14,15 @@ tasksRouter.get('/dashboard', verifyToken, isAdmin, getDashboard);
 
 // RUTAS CRUD PRINCIPALES
 tasksRouter.get('/', verifyToken, isAdmin, getTasks); 
-tasksRouter.post('/', verifyToken, isAdmin, validateSchema(createTaskSchema), createTask);
+tasksRouter.post('/', verifyToken, isAdmin, createTask);
 tasksRouter.get('/:id', verifyToken, getTaskById); 
-// CORRECCIÓN: Se inyecta el middleware en el PUT
-tasksRouter.put('/:id', verifyToken, isAdmin, validateSchema(updateTaskSchema), updateTask);
+tasksRouter.put('/:id', verifyToken, isAdmin, updateTask);
 tasksRouter.delete('/:id', verifyToken, isAdmin, deleteTask);
 
-// RUTA DE ESTADO 
+// RUTA DE ESTADO (Permite a los estudiantes cambiar el estado)
 tasksRouter.patch('/:id/status', verifyToken, patchTaskStatus);
 
-// RUTAS DE ASIGNACIÓN 
+// RUTAS DE ASIGNACIÓN (Compatibilidad con el Frontend)
 tasksRouter.post('/:taskId/assign', verifyToken, isAdmin, assignTaskToUsers);
 tasksRouter.get('/:taskId/users', verifyToken, isAdmin, getTaskUsers);
 tasksRouter.delete('/:taskId/users/:userId', verifyToken, isAdmin, removeUserFromTask);
