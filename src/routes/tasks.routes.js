@@ -7,12 +7,12 @@ import {
 import { verifyToken, isAdmin } from '../middlewares/auth.middleware.js';
 import { validateSchema } from '../middlewares/validate.middleware.js';
 // CORRECCIÓN: Se importan ambos esquemas
-import { createTaskSchema, updateTaskSchema, assignTaskSchema } from '../schemas/task.schema.js'; 
+import { createTaskSchema, updateTaskSchema, assignTaskSchema, filterTaskQuerySchema } from '../schemas/task.schema.js'; 
 
 const tasksRouter = express.Router();
 
 // RUTAS ESPECÍFICAS (Deben ir arriba)
-tasksRouter.get('/filter', verifyToken, isAdmin, filterTasks);
+tasksRouter.get('/filter', verifyToken, isAdmin, validateSchema(filterTaskQuerySchema, 'query'), filterTasks);
 tasksRouter.get('/dashboard', verifyToken, isAdmin, getDashboard);
 
 // RUTAS CRUD PRINCIPALES

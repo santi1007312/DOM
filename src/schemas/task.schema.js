@@ -27,3 +27,9 @@ export const assignTaskSchema = z.object({
     }).int().positive("Los IDs deben ser números positivos")
   ).min(1, "Debes enviar al menos un ID de usuario en el arreglo")
 }).strict("No se permiten campos adicionales en la asignación");
+
+export const filterTaskQuerySchema = z.object({
+  status: z.enum(["pendiente", "en progreso", "completada"], {
+      errorMap: () => ({ message: "El estado de filtro enviado en la URL no es válido" })
+  })
+}).strict("No se permiten parámetros adicionales en la URL");
