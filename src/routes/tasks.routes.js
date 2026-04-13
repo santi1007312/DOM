@@ -7,7 +7,7 @@ import {
 import { verifyToken, isAdmin } from '../middlewares/auth.middleware.js';
 import { validateSchema } from '../middlewares/validate.middleware.js';
 // CORRECCIÓN: Se importan ambos esquemas
-import { createTaskSchema, updateTaskSchema } from '../schemas/task.schema.js'; 
+import { createTaskSchema, updateTaskSchema, assignTaskSchema } from '../schemas/task.schema.js'; 
 
 const tasksRouter = express.Router();
 
@@ -27,7 +27,7 @@ tasksRouter.delete('/:id', verifyToken, isAdmin, deleteTask);
 tasksRouter.patch('/:id/status', verifyToken, patchTaskStatus);
 
 // RUTAS DE ASIGNACIÓN 
-tasksRouter.post('/:taskId/assign', verifyToken, isAdmin, assignTaskToUsers);
+tasksRouter.post('/:taskId/assign', verifyToken, isAdmin, validateSchema(assignTaskSchema), assignTaskToUsers);
 tasksRouter.get('/:taskId/users', verifyToken, isAdmin, getTaskUsers);
 tasksRouter.delete('/:taskId/users/:userId', verifyToken, isAdmin, removeUserFromTask);
 

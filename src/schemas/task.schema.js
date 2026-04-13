@@ -18,3 +18,12 @@ export const updateTaskSchema = z.object({
       errorMap: () => ({ message: "Estado de tarea no válido" })
   }).optional()
 }).strict();
+
+export const assignTaskSchema = z.object({
+  userIds: z.array(
+    z.number({ 
+      invalid_type_error: "Cada ID de usuario debe ser un número entero",
+      required_error: "Se requiere un ID de usuario" 
+    }).int().positive("Los IDs deben ser números positivos")
+  ).min(1, "Debes enviar al menos un ID de usuario en el arreglo")
+}).strict("No se permiten campos adicionales en la asignación");
