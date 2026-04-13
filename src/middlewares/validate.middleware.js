@@ -1,7 +1,6 @@
-// Actualizamos el middleware para que acepte un "target" (body, query o params)
 export const validateSchema = (schema, target = 'body') => {
   return (req, res, next) => {
-    // Ahora intercepta req.body o req.query dependiendo de lo que le pidamos
+    // Valida dinámicamente según el objetivo (body o query)
     const result = schema.safeParse(req[target]);
 
     if (!result.success) {
@@ -9,7 +8,7 @@ export const validateSchema = (schema, target = 'body') => {
         let finalMessage = issue.message;
 
         if (finalMessage.includes("received undefined")) {
-          finalMessage = "Este parámetro es obligatorio";
+          finalMessage = "Este campo es obligatorio";
         }
 
         return {
@@ -18,14 +17,15 @@ export const validateSchema = (schema, target = 'body') => {
         };
       });
 
-      const validationError = new Error(`Error de validación en los datos enviados por la URL (${target})`);
-      validationError.statusCode = 400;
-      validationError.errors = structuredErrors;
-
-      return next(validationError);
+      // RESPUESTA DIRECTA (Cortamos el flujo aquí con un 400 limpio)
+      return res.status(400).json({
+        success: false,
+        message: `Error de validación en: ${target}`,
+        errors: structuredErrors
+      });
     }
 
-    // Sobreescribe los datos limpios y seguros
+    // Inyectamos los datos ya validados y limpios
     req[target] = result.data;
     next();
   };
