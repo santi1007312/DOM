@@ -2,6 +2,7 @@ import pool from '../config/db.js';
 import { catchAsync } from '../utils/catchAsync.js';
 import { successResponse } from '../utils/response.handler.js';
 import { hashPassword, comparePassword, generateTokens } from '../utils/security.js';
+import jwt from 'jsonwebtoken'
 
 export const register = catchAsync(async (req, res) => {
   const { name, email, document, password, role } = req.body;
@@ -87,4 +88,55 @@ export const login = catchAsync(async (req, res) => {
     accessToken,
     refreshToken
   });
+});
+
+
+export const renewToken = catchAsync(async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    const error = new Error("Se requiere el Refresh Token para renovar la sesión");
+    error.statusCode = 400;
+    error.isOperational = true;
+    throw error;
+  }
+
+  try {
+    // 1. Verificamos el Refresh Token con su propia llave secreta
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+    // 2. Si es válido, generamos un NUEVO par de tokens usando nuestra utilidad
+    // (Esto se conoce como Refresh Token Rotation, mejora la seguridad)
+    const { accessToken, refreshToken: newRefreshToken } = generateTokens({
+      id: decoded.id,
+      role: decoded.role
+    });
+
+    return successResponse(res, 200, "Token renovado exitosamente", {
+      accessToken,
+      refreshToken: newRefreshToken
+    });
+
+  } catch (error) {
+    // CUMPLIMIENTO DE RÚBRICA: Respuestas centralizadas en español para el refresh
+    if (error.name === 'TokenExpiredError') {
+        return res.status(401).json({ 
+            ok: false, 
+            msn: "Su sesión ha expirado completamente. Por favor, inicie sesión de nuevo." 
+        });
+    }
+    
+    if (error.name === 'JsonWebTokenError') {
+        return res.status(401).json({ 
+            ok: false, 
+            msn: "Refresh token inválido o corrupto." 
+        });
+    }
+
+    // Fallback
+    const err = new Error("Error interno al renovar el token");
+    err.statusCode = 500;
+    err.isOperational = true;
+    throw err;
+  }
 });

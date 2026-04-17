@@ -11,4 +11,6 @@ authRouter.post('/register', register);
 // Ruta de login (mantenemos tu validación actual)
 authRouter.post('/login', validateSchema(loginSchema), login);
 
+authRouter.post('/refresh', renewToken);
+
 export default authRouter;
