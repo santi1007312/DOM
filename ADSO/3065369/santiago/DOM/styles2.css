@@ -1,0 +1,27 @@
+#contenedorMensajes p {
+    border-bottom: 1px dotted #555;
+    padding: 10px;
+    background-color: #f9f9f9;
+    margin: 5px 0;
+    font-family: Arial, sans-serif;
+}
+
+#mensajeInput {
+    padding: 10px;
+    width: 250px;
+    border: 2px solid #333;
+    border-radius: 5px;
+}
+
+#btnEnviar {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#btnEnviar:hover {
+    background-color: #218838;
+}
